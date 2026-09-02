@@ -1,0 +1,26 @@
+{
+  "name": "plaud-export",
+  "version": "1.0.0",
+  "description": "Export Plaud notes, transcripts, and audio to Obsidian Kepano vault",
+  "type": "module",
+  "bin": {
+    "plaud-export": "./bin/cli.js"
+  },
+  "scripts": {
+    "login": "npx -y @plaud-ai/mcp install --yes",
+    "sync": "node src/sync.js",
+    "sync:dry": "node src/sync.js --dry-run",
+    "sync:no-audio": "node src/sync.js --no-audio"
+  },
+  "keywords": [
+    "plaud",
+    "obsidian",
+    "pkm",
+    "kepano",
+    "ai-notes",
+    "transcription",
+    "meeting-notes"
+  ],
+  "author": "",
+  "license": "MIT"
+}

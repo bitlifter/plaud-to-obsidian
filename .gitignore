@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+Thumbs.db
+.plaud-sync-state.json
+.env
+.env.local
+.env.*.local
+!.env.example
+*.log
