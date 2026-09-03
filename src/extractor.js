@@ -49,13 +49,17 @@ export function parsePlaudDate(dateStr) {
     };
   }
 
-  const normalized = dateStr.replace(" ", "T");
-  const d = new Date(normalized);
+  let d;
+  if (typeof dateStr === "number") {
+    d = new Date(dateStr > 1e11 ? dateStr : dateStr * 1000);
+  } else if (typeof dateStr === "string" && dateStr.length === 10 && dateStr.includes("-")) {
+    d = new Date(`${dateStr}T12:00:00Z`);
+  } else {
+    d = new Date(dateStr);
+  }
 
   if (isNaN(d.getTime())) {
-    const match = dateStr.match(/(\d{4})-(\d{2})-(\d{2})/);
-    const date = match ? match[0] : new Date().toISOString().slice(0, 10);
-    return { date, time: "00:00", iso: dateStr };
+    d = new Date();
   }
 
   const pad = (n) => String(n).padStart(2, "0");

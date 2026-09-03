@@ -7,7 +7,8 @@ import {
   formatNoteTitle,
   parsePlaudDate,
   formatDuration,
-  generateNoteMarkdown
+  generateNoteMarkdown,
+  sanitizeFilename
 } from "./extractor.js";
 import { enrichMeetingData, loadEnvFile } from "./enricher.js";
 
@@ -223,7 +224,7 @@ async function run() {
       }
 
       // Prepare filenames
-      const { date, time } = parsePlaudDate(item.start_at || item.created_at);
+      const { date, time } = parsePlaudDate(item.start_time || item.start_at || item.created_at);
       const cleanTitle = formatNoteTitle(item.name, date, time);
       const noteFileName = `${cleanTitle}.md`;
       const noteFilePath = path.join(notesDir, noteFileName);
@@ -233,7 +234,8 @@ async function run() {
       let audioDownloaded = false;
 
       if (options.downloadAudio && fullRecord.presigned_url) {
-        audioFileName = `${date}_${item.id.slice(0, 8)}.mp3`;
+        const safeAudioBase = sanitizeFilename(item.name, 80);
+        audioFileName = `${date} ${safeAudioBase}.mp3`;
         const audioFilePath = path.join(attachmentsDir, audioFileName);
 
         if (!options.dryRun) {
