@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import { existsSync } from "fs";
+import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 import { PlaudClient } from "./plaud-client.js";
@@ -30,6 +31,10 @@ function parseArgs() {
     stateFile: DEFAULT_STATE_FILE
   };
 
+  if (args[0] === "login") {
+    return { login: true };
+  }
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "--vault" && args[i + 1]) {
@@ -51,6 +56,9 @@ function parseArgs() {
     } else if (arg === "--help" || arg === "-h") {
       console.log(`
 Plaud-to-Obsidian Exporter
+
+Commands:
+  login                   Authenticate and link your Plaud account via official OAuth
 
 Options:
   --vault <path>          Target Obsidian vault path (or set OBSIDIAN_VAULT_PATH in .env)
@@ -87,6 +95,18 @@ async function saveState(filePath, state) {
 async function run() {
   loadEnvFile();
   const options = parseArgs();
+
+  if (options.login) {
+    console.log("Launching Plaud OAuth login via @plaud-ai/mcp...\n");
+    const child = spawn("npx", ["-y", "@plaud-ai/mcp", "install", "--yes"], {
+      stdio: "inherit",
+      shell: true
+    });
+    child.on("close", (code) => {
+      process.exit(code ?? 0);
+    });
+    return;
+  }
 
   if (!options.vault) {
     console.error("\n[Error] No Obsidian vault path specified!");
